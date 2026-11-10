@@ -62,6 +62,7 @@
             background-color: #ffffff !important;
         }
 
+        /* Watermark Background */
         .watermark-overlay {
             position: relative;
         }
@@ -123,20 +124,17 @@
         </div>
     </header>
 
-    <!-- Mobile Navigation Tabs (4 Tabs: Edit, View, History, Reports) -->
+    <!-- Mobile Navigation Tabs -->
     <div class="no-print max-w-md mx-auto px-4 mt-2 mb-2">
-        <div class="grid grid-cols-4 gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 shadow-inner">
-            <button id="tabBtnForm" onclick="switchTab('form')" class="py-1.5 text-[9.5px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow">
-                <i class="fa-solid fa-file-pen"></i> Edit
+        <div class="grid grid-cols-3 gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 shadow-inner">
+            <button id="tabBtnForm" onclick="switchTab('form')" class="py-1.5 text-[10px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow">
+                <i class="fa-solid fa-file-pen mr-1"></i> Edit
             </button>
-            <button id="tabBtnPreview" onclick="switchTab('preview')" class="py-1.5 text-[9.5px] font-extrabold text-slate-400 hover:text-white rounded-lg transition">
-                <i class="fa-solid fa-mobile-screen"></i> Slip
+            <button id="tabBtnPreview" onclick="switchTab('preview')" class="py-1.5 text-[10px] font-extrabold text-slate-400 hover:text-white rounded-lg transition">
+                <i class="fa-solid fa-mobile-screen mr-1"></i> Slip View
             </button>
-            <button id="tabBtnHistory" onclick="switchTab('history')" class="py-1.5 text-[9.5px] font-extrabold text-slate-400 hover:text-white rounded-lg transition relative">
-                <i class="fa-solid fa-clock-rotate-left"></i> Logs <span id="historyBadge" class="ml-0.5 bg-amber-500 text-slate-950 px-1 py-0.2 rounded-full text-[7.5px] font-black">0</span>
-            </button>
-            <button id="tabBtnReports" onclick="switchTab('reports')" class="py-1.5 text-[9.5px] font-extrabold text-slate-400 hover:text-white rounded-lg transition">
-                <i class="fa-solid fa-chart-pie"></i> Reports
+            <button id="tabBtnHistory" onclick="switchTab('history')" class="py-1.5 text-[10px] font-extrabold text-slate-400 hover:text-white rounded-lg transition relative">
+                <i class="fa-solid fa-clock-rotate-left mr-1"></i> History <span id="historyBadge" class="ml-0.5 bg-amber-500 text-slate-950 px-1.5 py-0.2 rounded-full text-[8px] font-black">0</span>
             </button>
         </div>
     </div>
@@ -271,7 +269,7 @@
                                 <span class="text-slate-200">Eng Raja Khayam</span>
                             </div>
                             <div class="flex items-center gap-1.5">
-                                <span class="text-white">0596840746</span>
+                                <span class="text-white">05968407467</span>
                                 <span class="text-slate-600">|</span>
                                 <span class="text-white">0561196930</span>
                             </div>
@@ -321,7 +319,7 @@
 
                     </div>
 
-                    <!-- BOTTOM SECTION -->
+                    <!-- BOTTOM SECTION (Totals + 3 Pictures on Right Center + Barcode at Bottom Center + Signatures) -->
                     <div class="space-y-1.5 relative z-10 pt-1.5">
                         
                         <!-- Totals & Right-Side Centered Pictures Row -->
@@ -346,7 +344,7 @@
                                 </div>
                             </div>
 
-                            <!-- 3 Pictures (`photo.png`, `electric.png`, `pipe.png`) -->
+                            <!-- 3 Pictures (`photo.png`, `electric.png`, `pipe.png`) Vertically Centered on Right Side -->
                             <div class="flex flex-col gap-1 items-center bg-white p-1 rounded-lg border border-slate-200 shadow-sm ml-2 flex-shrink-0">
                                 <div class="w-6 h-6 bg-slate-100 rounded flex items-center justify-center overflow-hidden">
                                     <img src="photo.png" class="w-full h-full object-contain" alt="P1" onerror="this.style.display='none'">
@@ -424,35 +422,6 @@
             </div>
         </section>
 
-        <!-- 4. REPORTS SECTION (NEW) -->
-        <section id="sectionReports" class="hidden bg-slate-900 p-3.5 rounded-2xl border border-slate-800 shadow-xl space-y-3">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h2 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <i class="fa-solid fa-chart-pie"></i> Business Analytics & Reports
-                </h2>
-                <span class="text-[9px] text-slate-400 font-mono">Live Data</span>
-            </div>
-
-            <!-- Analytics Summary Cards -->
-            <div class="grid grid-cols-2 gap-2.5">
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                    <span class="text-[9px] text-slate-400 uppercase font-bold block">Total Bookings</span>
-                    <span id="reportTotalBookings" class="text-lg font-black text-amber-400">0</span>
-                </div>
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                    <span class="text-[9px] text-slate-400 uppercase font-bold block">Total Revenue</span>
-                    <span id="reportTotalRevenue" class="text-lg font-black text-emerald-400">0.00 SAR</span>
-                </div>
-            </div>
-
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
-                <h3 class="text-[10px] font-bold text-slate-300 uppercase tracking-wider border-b border-slate-800 pb-1.5">Recent Transactions Summary</h3>
-                <div id="reportListContainer" class="space-y-1.5 max-h-[260px] overflow-y-auto pr-1 text-xs">
-                    <!-- Dynamic summary rows -->
-                </div>
-            </div>
-        </section>
-
     </main>
 
     <script>
@@ -506,54 +475,39 @@
             if(!document.getElementById('sectionHistory').classList.contains('hidden')) {
                 renderHistory();
             }
-            if(!document.getElementById('sectionReports').classList.contains('hidden')) {
-                renderReports();
-            }
         });
 
         function switchTab(tab) {
             const formSec = document.getElementById('sectionForm');
             const previewSec = document.getElementById('sectionPreview');
             const historySec = document.getElementById('sectionHistory');
-            const reportsSec = document.getElementById('sectionReports');
 
             const btnForm = document.getElementById('tabBtnForm');
             const btnPreview = document.getElementById('tabBtnPreview');
             const btnHistory = document.getElementById('tabBtnHistory');
-            const btnReports = document.getElementById('tabBtnReports');
 
-            [btnForm, btnPreview, btnHistory, btnReports].forEach(btn => {
-                btn.className = "py-1.5 text-[9.5px] font-extrabold text-slate-400 hover:text-white rounded-lg transition";
+            [btnForm, btnPreview, btnHistory].forEach(btn => {
+                btn.className = "py-1.5 text-[10px] font-extrabold text-slate-400 hover:text-white rounded-lg transition";
             });
 
             if (tab === 'form') {
                 formSec.classList.remove('hidden');
                 previewSec.classList.add('hidden');
                 historySec.classList.add('hidden');
-                reportsSec.classList.add('hidden');
-                btnForm.className = "py-1.5 text-[9.5px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow";
+                btnForm.className = "py-1.5 text-[10px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow";
             } else if (tab === 'preview') {
                 formSec.classList.add('hidden');
                 previewSec.classList.remove('hidden');
                 historySec.classList.add('hidden');
-                reportsSec.classList.add('hidden');
-                btnPreview.className = "py-1.5 text-[9.5px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow";
+                btnPreview.className = "py-1.5 text-[10px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow";
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 generateBarcode();
             } else if (tab === 'history') {
                 formSec.classList.add('hidden');
                 previewSec.classList.add('hidden');
                 historySec.classList.remove('hidden');
-                reportsSec.classList.add('hidden');
-                btnHistory.className = "py-1.5 text-[9.5px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow";
+                btnHistory.className = "py-1.5 text-[10px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow";
                 renderHistory();
-            } else if (tab === 'reports') {
-                formSec.classList.add('hidden');
-                previewSec.classList.add('hidden');
-                historySec.classList.add('hidden');
-                reportsSec.classList.remove('hidden');
-                btnReports.className = "py-1.5 text-[9.5px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow";
-                renderReports();
             }
         }
 
@@ -765,38 +719,6 @@
             updateHistoryBadge();
         }
 
-        function renderReports() {
-            const totalBookings = savedInvoices.length;
-            let totalRevenue = 0;
-
-            const listContainer = document.getElementById('reportListContainer');
-            listContainer.innerHTML = '';
-
-            if (savedInvoices.length === 0) {
-                listContainer.innerHTML = `<div class="py-6 text-center text-xs text-slate-500 italic">No transaction data available for reports.</div>`;
-            }
-
-            savedInvoices.forEach(inv => {
-                const subtotal = inv.items.reduce((sum, i) => sum + (i.quantity * i.rate), 0);
-                const grandTotal = Math.max(0, subtotal - (inv.discount || 0)) * (1 + (inv.taxRate || 0)/100);
-                totalRevenue += grandTotal;
-
-                const row = document.createElement('div');
-                row.className = 'flex justify-between items-center bg-slate-900 p-2 rounded-lg border border-slate-800 text-[11px]';
-                row.innerHTML = `
-                    <div>
-                        <span class="font-mono text-amber-400 font-bold">${inv.invoiceNo}</span>
-                        <span class="text-slate-400 block text-[9px]">${inv.customerName || 'Client'} (${inv.date})</span>
-                    </div>
-                    <span class="font-black text-emerald-400">${grandTotal.toFixed(2)} SAR</span>
-                `;
-                listContainer.appendChild(row);
-            });
-
-            document.getElementById('reportTotalBookings').textContent = totalBookings;
-            document.getElementById('reportTotalRevenue').textContent = totalRevenue.toFixed(2) + ' SAR';
-        }
-
         function loadInvoice(id) {
             const found = savedInvoices.find(inv => inv.id === id);
             if (!found) return;
@@ -820,7 +742,6 @@
             if (confirm('Delete this saved receipt from history?')) {
                 db.ref('invoices/' + id).remove().then(() => {
                     renderHistory();
-                    renderReports();
                 });
             }
         }
@@ -830,7 +751,6 @@
                 db.ref('invoices').remove().then(() => {
                     localStorage.removeItem('raja_khayam_permanent_invoices');
                     renderHistory();
-                    renderReports();
                 });
             }
         }
