@@ -1,0 +1,371 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>RAJA 999 ELECTRITION - Mobile Booking & Receipt Generator</title><link rel="icon" type="image/png" href="logo.png"><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet"><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script><script>tailwind.config={theme:{extend:{colors:{gold:{300:"#ffe066",400:"#facc15",500:"#e5a913",600:"#ca8a04",700:"#9a6107"},darkbg:"#0a0d14"},fontFamily:{sans:["Inter","Tajawal","sans-serif"],brand:["Cinzel","Inter","sans-serif"]}}}}</script><style>body{font-family:Inter,Tajawal,sans-serif;background-color:#090d16;color:#f1f5f9;-webkit-tap-highlight-color:transparent}.receipt-container{width:100%;max-width:450px;box-sizing:border-box;background-color:#fff!important}.watermark-overlay{position:relative}.watermark-overlay::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:240px;height:240px;background-image:url(logo.png);background-size:contain;background-repeat:no-repeat;background-position:center;opacity:.04;pointer-events:none;z-index:0}@media print{body{background:#fff!important;color:#000!important;padding:0!important}.no-print{display:none!important}.print-area{width:100%!important;max-width:100%!important;box-shadow:none!important;border:none!important;margin:0!important;padding:8px!important}}</style></head><body class="min-h-screen pb-12 select-none"><header class="no-print bg-slate-900/95 border-b border-amber-500/30 sticky top-0 z-50 backdrop-blur-md"><div class="max-w-md mx-auto px-4 py-2.5 flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-full border-2 border-amber-400 bg-black flex items-center justify-center overflow-hidden p-0.5 shadow-md"><img id="appHeaderLogo" src="logo.png" class="w-full h-full object-contain" alt="Logo" onerror='this.src="https://via.placeholder.com/40?text=R999"'></div><div><h1 class="text-xs font-extrabold text-amber-400 tracking-wide uppercase leading-tight font-brand">RAJA 999 ELECTRITION</h1><p class="text-[9px] text-slate-400 font-medium">Eng Raja Khayam</p></div></div><button onclick="createNewInvoice()" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1"><i class="fa-solid fa-plus text-[9px]"></i>New</button></div></header><div class="no-print max-w-md mx-auto px-4 mt-2 mb-2"><div class="grid grid-cols-3 gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 shadow-inner"><button id="tabBtnForm" onclick='switchTab("form")' class="py-1.5 text-[10px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow"><i class="fa-solid fa-file-pen mr-1"></i>Edit</button><button id="tabBtnPreview" onclick='switchTab("preview")' class="py-1.5 text-[10px] font-extrabold text-slate-400 hover:text-white rounded-lg transition"><i class="fa-solid fa-mobile-screen mr-1"></i>Slip View</button><button id="tabBtnHistory" onclick='switchTab("history")' class="py-1.5 text-[10px] font-extrabold text-slate-400 hover:text-white rounded-lg transition relative"><i class="fa-solid fa-clock-rotate-left mr-1"></i>History<span id="historyBadge" class="ml-0.5 bg-amber-500 text-slate-950 px-1.5 py-0.2 rounded-full text-[8px] font-black">0</span></button></div></div><main class="max-w-md mx-auto px-4"><section id="sectionForm" class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 shadow-xl space-y-3"><div class="flex justify-between items-center border-b border-slate-800 pb-2"><h2 class="text-[11px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-sliders"></i>Booking Input Details</h2><span class="text-[9px] text-slate-400 font-mono" id="formInvoiceIDDisplay"></span></div><div class="grid grid-cols-2 gap-2"><div><label class="block text-[9px] font-bold text-slate-400 mb-1 uppercase">Receipt No.</label><input type="text" id="inputInvoiceNo" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-amber-400 focus:outline-none focus:border-amber-400" oninput="updateInvoice()"></div><div><label class="block text-[9px] font-bold text-slate-400 mb-1 uppercase">Date</label><input type="date" id="inputDate" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400" onchange="updateInvoice()"></div></div><div class="space-y-1.5 pt-1.5 border-t border-slate-800/80"><div><label class="block text-[9px] font-bold text-slate-400 mb-1 uppercase">Customer / Client Name</label><input type="text" id="inputCustomerName" placeholder="e.g. Al-Mansoor Villa" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400" oninput="updateInvoice()"></div><div class="grid grid-cols-2 gap-2"><div><label class="block text-[9px] font-bold text-slate-400 mb-1 uppercase">Customer Phone</label><input type="text" id="inputCustomerPhone" placeholder="05xxxxxxxx" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400" oninput="updateInvoice()"></div><div><label class="block text-[9px] font-bold text-slate-400 mb-1 uppercase">Job Location</label><input type="text" id="inputLocation" placeholder="Riyadh, KSA" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400" oninput="updateInvoice()"></div></div></div><div class="space-y-2 pt-1.5 border-t border-slate-800/80"><div class="flex justify-between items-center"><label class="block text-[9px] font-bold text-slate-400 uppercase">Services & Material Items</label><button onclick="addItemRow()" class="bg-amber-400 text-slate-950 hover:bg-amber-300 font-extrabold text-[9px] px-2 py-0.5 rounded transition flex items-center gap-1 shadow"><i class="fa-solid fa-plus text-[8px]"></i>Add Item</button></div><div id="itemsContainer" class="space-y-1.5 max-h-[220px] overflow-y-auto pr-1"></div></div><div class="grid grid-cols-2 gap-2 pt-1.5 border-t border-slate-800/80"><div><label class="block text-[9px] font-bold text-slate-400 mb-1 uppercase">Discount (SAR)</label><input type="number" id="inputDiscount" value="0" min="0" step="1" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400" oninput="updateInvoice()"></div><div><label class="block text-[9px] font-bold text-slate-400 mb-1 uppercase">VAT / Tax Rate (%)</label><input type="number" id="inputTax" value="0" min="0" step="1" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400" oninput="updateInvoice()"></div></div><div class="pt-2 border-t border-slate-800 flex gap-2"><button onclick="saveCurrentInvoice()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-extrabold text-[11px] py-2.5 rounded-xl border border-amber-500/30 transition flex items-center justify-center gap-1.5 shadow-md"><i class="fa-solid fa-floppy-disk"></i>Save Booking</button><button onclick='switchTab("preview")' class="flex-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[11px] py-2.5 rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg"><i class="fa-solid fa-mobile-screen"></i>View Slip</button></div></section><section id="sectionPreview" class="hidden flex flex-col items-center"><div class="no-print w-full mb-2.5 bg-slate-900 border border-slate-800 p-2 rounded-xl flex items-center justify-between shadow-lg"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span class="text-[10px] font-bold text-slate-300">Compact Mobile Slip View</span></div><div class="flex items-center gap-1.5"><button onclick="capturePNG()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[10px] px-2.5 py-1 rounded-lg shadow flex items-center gap-1 transition"><i class="fa-solid fa-camera text-[9px]"></i>Save PNG</button><button onclick="downloadPDF()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-[10px] px-2 py-1 rounded-lg transition"><i class="fa-solid fa-file-pdf text-[9px]"></i>PDF</button></div></div><div class="w-full flex justify-center overflow-x-auto py-1"><div id="invoiceReceipt916" class="receipt-container print-area watermark-overlay bg-white text-slate-900 p-3.5 rounded-xl shadow-2xl border border-slate-300 relative flex flex-col justify-between"><div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-slate-950 via-amber-500 to-slate-950"></div><div class="space-y-1.5 relative z-10 pt-1"><div class="flex items-center justify-between border-b-2 border-slate-900 pb-2 gap-2"><div class="flex-1 text-left px-1"><h1 class="text-xs sm:text-sm font-black text-slate-900 tracking-tight leading-none uppercase font-brand">RAJA 999 ELECTRITION</h1><p class="text-[7.5px] font-bold text-slate-700 mt-0.5">Riyadh, Saudi Arabia</p><p class="text-[7px] font-extrabold text-amber-600 tracking-wider mt-0.5 uppercase">ALL ELECTRICAL GOODS UNDER ONE ROOF</p></div><div class="w-12 h-12 bg-black rounded-lg p-0.5 border-2 border-amber-500 shadow-sm flex items-center justify-center flex-shrink-0"><img src="logo.png" class="w-full h-full object-contain" alt="Logo" onerror='this.src="https://via.placeholder.com/40?text=Logo"'></div></div><div class="bg-slate-900 text-white rounded-lg px-2 py-1 flex justify-between items-center text-[9px] font-bold shadow-sm"><div class="flex items-center gap-1 text-amber-400"><i class="fa-solid fa-user text-[8px]"></i><span class="text-slate-200">Eng Raja Khayam</span></div><div class="flex items-center gap-1.5"><span class="text-white">0596840746</span><span class="text-slate-600">|</span><span class="text-white">0561196930</span></div></div><div class="flex justify-between items-center bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-lg text-[10px]"><div><span class="text-[7px] text-slate-500 font-bold block uppercase tracking-wider">BOOKING RECEIPT</span><span id="outInvoiceNo" class="font-mono font-black text-slate-900 text-[11px]">R999-1001</span></div><div class="text-right"><span class="text-[7px] text-slate-500 font-bold block uppercase tracking-wider">DATE</span><span id="outDate" class="font-extrabold text-slate-900 text-[10px]">2026-10-21</span></div></div><div class="bg-slate-50 p-2 rounded-xl border border-slate-200 text-[10px] grid grid-cols-2 gap-2"><div><span class="text-[7px] text-slate-400 font-extrabold uppercase block">CLIENT NAME:</span><span id="outCustomerName" class="font-black text-slate-900 text-[11px] truncate block">Client Name</span><span id="outCustomerPhone" class="text-[9px] text-slate-600 font-semibold block"></span></div><div class="text-right"><span class="text-[7px] text-slate-400 font-extrabold uppercase block">JOB LOCATION:</span><span id="outLocation" class="font-bold text-slate-800 text-[10px] truncate block">Riyadh, KSA</span></div></div><div class="border border-slate-900 rounded-xl overflow-hidden shadow-sm bg-white"><table class="w-full text-left text-[9px]"><thead><tr class="bg-slate-900 text-amber-400 font-black uppercase text-[8px] tracking-wider"><th class="py-1 px-1.5 border-r border-slate-800">Description</th><th class="py-1 px-1 text-center w-7 border-r border-slate-800">Qty</th><th class="py-1 px-1 text-right w-11 border-r border-slate-800">Rate</th><th class="py-1 px-1.5 text-right w-12">Total</th></tr></thead><tbody id="outTableBody" class="divide-y divide-slate-200 font-medium text-slate-800"></tbody></table></div></div><div class="space-y-1.5 relative z-10 pt-1.5"><div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-200 relative"><div class="w-full max-w-[190px] space-y-0.5 text-[9px]"><div class="flex justify-between text-slate-600"><span>Subtotal:</span><span class="font-bold text-slate-900"><span id="outSubtotal">0.00</span>SAR</span></div><div id="outDiscountRow" class="flex justify-between text-emerald-700 hidden"><span>Discount:</span><span class="font-bold">-<span id="outDiscount">0.00</span>SAR</span></div><div id="outTaxRow" class="flex justify-between text-slate-600"><span>VAT (<span id="outTaxRate">0</span>%):</span><span class="font-bold text-slate-900"><span id="outTax">0.00</span>SAR</span></div><div class="flex justify-between text-[11px] font-black text-slate-900 pt-0.5 border-t-2 border-slate-900"><span>NET TOTAL:</span><span class="text-amber-600 font-black"><span id="outGrandTotal">0.00</span>SAR</span></div></div><div class="flex flex-col gap-1 items-center bg-white p-1 rounded-lg border border-slate-200 shadow-sm ml-2 flex-shrink-0"><div class="w-6 h-6 bg-slate-100 rounded flex items-center justify-center overflow-hidden"><img src="photo.png" class="w-full h-full object-contain" alt="P1" onerror='this.style.display="none"'></div><div class="w-6 h-6 bg-slate-100 rounded flex items-center justify-center overflow-hidden"><img src="electric.png" class="w-full h-full object-contain" alt="P2" onerror='this.style.display="none"'></div><div class="w-6 h-6 bg-slate-100 rounded flex items-center justify-center overflow-hidden"><img src="pipe.png" class="w-full h-full object-contain" alt="P3" onerror='this.style.display="none"'></div></div></div><div class="flex flex-col items-center cursor-pointer py-0.5" onclick="capturePNG()" title="Click to download image"><svg id="barcode" class="max-w-[140px] h-8"></svg><span class="text-[6.5px] text-amber-600 font-bold uppercase">Click Barcode for Image</span></div><div class="pt-1 border-t border-slate-200"><div class="grid grid-cols-2 gap-2 text-center"><div><div class="h-6 border-b-2 border-dashed border-slate-300 mb-0.5 flex items-end justify-center"><span class="text-[7px] text-slate-300 italic">Sign Here</span></div><span class="text-[7.5px] font-black text-slate-800 uppercase tracking-wide">Customer Signature</span></div><div><div class="h-6 border-b-2 border-dashed border-slate-300 mb-0.5 flex items-end justify-center"><span class="text-[7px] text-slate-300 italic">Stamp Here</span></div><span class="text-[7.5px] font-black text-slate-800 uppercase tracking-wide">Company Stamp</span></div></div></div><div class="text-center text-[7px] text-slate-500 font-bold border-t border-slate-200 pt-0.5 flex justify-between items-center"><span>RAJA 999 ELECTRITION</span><span class="text-amber-600">Eng Raja Khayam</span><span>Riyadh, KSA</span></div></div><div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-950 via-amber-500 to-slate-950"></div></div></div></section><section id="sectionHistory" class="hidden bg-slate-900 p-3.5 rounded-2xl border border-slate-800 shadow-xl space-y-3"><div class="flex justify-between items-center border-b border-slate-800 pb-2"><h2 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-folder-open"></i>Saved Booking History (Firebase)</h2><button onclick="clearAllHistory()" class="text-[10px] text-rose-400 font-bold hover:underline">Clear History</button></div><div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i><input type="text" id="inputSearchHistory" oninput="renderHistory()" placeholder="Search by customer or receipt #..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"></div><div id="historyListContainer" class="space-y-2 max-h-[400px] overflow-y-auto pr-0.5"></div></section></main><script>// ================= FIREBASE CONFIGURATION =================
+        const firebaseConfig = {
+            apiKey: "AIzaSyABHfb8n07dTF0gvQ5bwcCIe6f1QuAp90M",
+            authDomain: "raja-999.firebaseapp.com",
+            databaseURL: "https://raja-999-default-rtdb.firebaseio.com",
+            projectId: "raja-999",
+            storageBucket: "raja-999.firebasestorage.app",
+            messagingSenderId: "710431322135",
+            appId: "1:710431322135:web:25f465a2d27cb363f3ec52",
+            measurementId: "G-SY3SJMNS3G"
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
+        function generateUniqueInvoiceNo() {
+            const randomNum = Math.floor(100 + Math.random() * 900);
+            const timeSuffix = Date.now().toString().slice(-4);
+            return 'R999-' + timeSuffix + randomNum;
+        }
+
+        let currentInvoice = {
+            id: Date.now(),
+            invoiceNo: generateUniqueInvoiceNo(),
+            date: new Date().toISOString().split('T')[0],
+            customerName: '',
+            customerPhone: '',
+            location: 'Riyadh, KSA',
+            taxRate: 0,
+            discount: 0,
+            items: [
+                { description: '', quantity: 1, rate: 0 }
+            ]
+        };
+
+        let savedInvoices = [];
+
+        db.ref('invoices').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                savedInvoices = Object.values(data).reverse();
+            } else {
+                savedInvoices = JSON.parse(localStorage.getItem('raja_khayam_permanent_invoices') || '[]');
+            }
+            updateHistoryBadge();
+            if(!document.getElementById('sectionHistory').classList.contains('hidden')) {
+                renderHistory();
+            }
+        });
+
+        function switchTab(tab) {
+            const formSec = document.getElementById('sectionForm');
+            const previewSec = document.getElementById('sectionPreview');
+            const historySec = document.getElementById('sectionHistory');
+
+            const btnForm = document.getElementById('tabBtnForm');
+            const btnPreview = document.getElementById('tabBtnPreview');
+            const btnHistory = document.getElementById('tabBtnHistory');
+
+            [btnForm, btnPreview, btnHistory].forEach(btn => {
+                btn.className = "py-1.5 text-[10px] font-extrabold text-slate-400 hover:text-white rounded-lg transition";
+            });
+
+            if (tab === 'form') {
+                formSec.classList.remove('hidden');
+                previewSec.classList.add('hidden');
+                historySec.classList.add('hidden');
+                btnForm.className = "py-1.5 text-[10px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow";
+            } else if (tab === 'preview') {
+                formSec.classList.add('hidden');
+                previewSec.classList.remove('hidden');
+                historySec.classList.add('hidden');
+                btnPreview.className = "py-1.5 text-[10px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                generateBarcode();
+            } else if (tab === 'history') {
+                formSec.classList.add('hidden');
+                previewSec.classList.add('hidden');
+                historySec.classList.remove('hidden');
+                btnHistory.className = "py-1.5 text-[10px] font-extrabold rounded-lg transition text-slate-950 bg-amber-400 shadow";
+                renderHistory();
+            }
+        }
+
+        function renderItemsForm() {
+            const container = document.getElementById('itemsContainer');
+            container.innerHTML = '';
+
+            currentInvoice.items.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-slate-950 p-2 rounded-xl border border-slate-800 space-y-1.5';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center text-[9px]">
+                        <span class="font-bold text-amber-400">Item #${index + 1}</span>
+                        ${currentInvoice.items.length > 1 ? `<button onclick="removeItemRow(${index})" class="text-rose-400 font-bold hover:underline text-[8px]"><i class="fa-solid fa-trash-can"></i> Delete</button>` : ''}
+                    </div>
+                    <input type="text" placeholder="Description / Particulars" value="${item.description}" oninput="updateItem(${index}, 'description', this.value)" class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-amber-400">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <span class="text-[7.5px] text-slate-500 font-bold block uppercase">Qty</span>
+                            <input type="number" min="1" value="${item.quantity}" oninput="updateItem(${index}, 'quantity', this.value)" class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-amber-400">
+                        </div>
+                        <div>
+                            <span class="text-[7.5px] text-slate-500 font-bold block uppercase">Rate (SAR)</span>
+                            <input type="number" min="0" step="1" value="${item.rate}" oninput="updateItem(${index}, 'rate', this.value)" class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-amber-400">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addItemRow() {
+            currentInvoice.items.push({ description: '', quantity: 1, rate: 0 });
+            renderItemsForm();
+            updateInvoice();
+        }
+
+        function removeItemRow(index) {
+            currentInvoice.items.splice(index, 1);
+            renderItemsForm();
+            updateInvoice();
+        }
+
+        function updateItem(index, field, value) {
+            if (field === 'quantity') currentInvoice.items[index][field] = parseInt(value) || 0;
+            else if (field === 'rate') currentInvoice.items[index][field] = parseFloat(value) || 0;
+            else currentInvoice.items[index][field] = value;
+            updateInvoice();
+        }
+
+        function updateInvoice() {
+            currentInvoice.invoiceNo = document.getElementById('inputInvoiceNo').value || generateUniqueInvoiceNo();
+            currentInvoice.date = document.getElementById('inputDate').value;
+            currentInvoice.customerName = document.getElementById('inputCustomerName').value;
+            currentInvoice.customerPhone = document.getElementById('inputCustomerPhone').value;
+            currentInvoice.location = document.getElementById('inputLocation').value || 'Riyadh, KSA';
+            currentInvoice.discount = parseFloat(document.getElementById('inputDiscount').value) || 0;
+            currentInvoice.taxRate = parseFloat(document.getElementById('inputTax').value) || 0;
+
+            document.getElementById('formInvoiceIDDisplay').textContent = '#' + currentInvoice.invoiceNo;
+            document.getElementById('outInvoiceNo').textContent = currentInvoice.invoiceNo;
+            document.getElementById('outDate').textContent = currentInvoice.date || '___/___/______';
+            document.getElementById('outCustomerName').textContent = currentInvoice.customerName || 'Client Name';
+            document.getElementById('outCustomerPhone').textContent = currentInvoice.customerPhone ? 'Tel: ' + currentInvoice.customerPhone : '';
+            document.getElementById('outLocation').textContent = currentInvoice.location;
+
+            const tableBody = document.getElementById('outTableBody');
+            tableBody.innerHTML = '';
+
+            let subtotal = 0;
+
+            currentInvoice.items.forEach(item => {
+                const total = item.quantity * item.rate;
+                subtotal += total;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-1 px-1.5 border-r border-slate-200 font-bold text-slate-900 leading-tight">${item.description || '&nbsp;'}</td>
+                    <td class="py-1 px-1 text-center border-r border-slate-200 font-semibold text-slate-700">${item.quantity || ''}</td>
+                    <td class="py-1 px-1 text-right border-r border-slate-200 text-slate-700">${item.rate ? item.rate.toFixed(2) : ''}</td>
+                    <td class="py-1 px-1.5 text-right font-black text-slate-900">${total ? total.toFixed(2) : ''}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            const afterDiscount = Math.max(0, subtotal - currentInvoice.discount);
+            const taxVal = (afterDiscount * currentInvoice.taxRate) / 100;
+            const grandTotal = afterDiscount + taxVal;
+
+            document.getElementById('outSubtotal').textContent = subtotal.toFixed(2);
+            document.getElementById('outTaxRate').textContent = currentInvoice.taxRate;
+            document.getElementById('outTax').textContent = taxVal.toFixed(2);
+
+            if (currentInvoice.discount > 0) {
+                document.getElementById('outDiscountRow').classList.remove('hidden');
+                document.getElementById('outDiscount').textContent = currentInvoice.discount.toFixed(2);
+            } else {
+                document.getElementById('outDiscountRow').classList.add('hidden');
+            }
+
+            document.getElementById('outGrandTotal').textContent = grandTotal.toFixed(2);
+        }
+
+        function generateBarcode() {
+            try {
+                JsBarcode("#barcode", currentInvoice.invoiceNo, {
+                    format: "CODE128",
+                    lineColor: "#000",
+                    width: 1.2,
+                    height: 28,
+                    displayValue: true,
+                    fontSize: 9
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function saveCurrentInvoice() {
+            currentInvoice.invoiceNo = document.getElementById('inputInvoiceNo').value || generateUniqueInvoiceNo();
+            currentInvoice.date = document.getElementById('inputDate').value;
+            currentInvoice.customerName = document.getElementById('inputCustomerName').value;
+            currentInvoice.customerPhone = document.getElementById('inputCustomerPhone').value;
+            currentInvoice.location = document.getElementById('inputLocation').value || 'Riyadh, KSA';
+            currentInvoice.discount = parseFloat(document.getElementById('inputDiscount').value) || 0;
+            currentInvoice.taxRate = parseFloat(document.getElementById('inputTax').value) || 0;
+
+            if (!currentInvoice.customerName.trim()) {
+                alert('Please enter a Customer / Client Name before saving.');
+                return;
+            }
+
+            db.ref('invoices/' + currentInvoice.id).set(currentInvoice).then(() => {
+                alert('Booking successfully saved to Firebase Cloud & History!');
+            }).catch((error) => {
+                let localData = JSON.parse(localStorage.getItem('raja_khayam_permanent_invoices') || '[]');
+                const existingIndex = localData.findIndex(inv => inv.id === currentInvoice.id);
+                if (existingIndex >= 0) localData[existingIndex] = currentInvoice;
+                else localData.unshift(currentInvoice);
+                localStorage.setItem('raja_khayam_permanent_invoices', JSON.stringify(localData));
+                alert('Saved locally (Offline mode)');
+            });
+        }
+
+        function createNewInvoice() {
+            currentInvoice = {
+                id: Date.now(),
+                invoiceNo: generateUniqueInvoiceNo(),
+                date: new Date().toISOString().split('T')[0],
+                customerName: '',
+                customerPhone: '',
+                location: 'Riyadh, KSA',
+                taxRate: 0,
+                discount: 0,
+                items: [{ description: '', quantity: 1, rate: 0 }]
+            };
+
+            document.getElementById('inputInvoiceNo').value = currentInvoice.invoiceNo;
+            document.getElementById('inputDate').value = currentInvoice.date;
+            document.getElementById('inputCustomerName').value = '';
+            document.getElementById('inputCustomerPhone').value = '';
+            document.getElementById('inputLocation').value = 'Riyadh, KSA';
+            document.getElementById('inputDiscount').value = 0;
+            document.getElementById('inputTax').value = 0;
+
+            renderItemsForm();
+            updateInvoice();
+            switchTab('form');
+        }
+
+        function renderHistory() {
+            const search = (document.getElementById('inputSearchHistory').value || '').toLowerCase();
+            const container = document.getElementById('historyListContainer');
+            container.innerHTML = '';
+
+            const filtered = savedInvoices.filter(inv => 
+                inv.invoiceNo.toLowerCase().includes(search) || 
+                inv.customerName.toLowerCase().includes(search)
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="py-8 text-center text-xs text-slate-500 italic">No saved bookings found.</div>`;
+                return;
+            }
+
+            filtered.forEach(inv => {
+                const total = inv.items.reduce((sum, i) => sum + (i.quantity * i.rate), 0);
+                const grandTotal = Math.max(0, total - (inv.discount || 0)) * (1 + (inv.taxRate || 0)/100);
+
+                const card = document.createElement('div');
+                card.className = 'bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between';
+                card.innerHTML = `
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-extrabold text-amber-400 text-xs">${inv.invoiceNo}</span>
+                            <span class="text-[9px] text-slate-500">${inv.date}</span>
+                        </div>
+                        <h4 class="text-xs font-bold text-white">${inv.customerName}</h4>
+                        <p class="text-[10px] font-extrabold text-slate-300">${grandTotal.toFixed(2)} SAR</p>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="loadInvoice(${inv.id})" class="bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-lg text-xs hover:bg-amber-300">Open</button>
+                        <button onclick="deleteInvoice(${inv.id})" class="text-rose-400 hover:text-rose-300 p-1.5"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            updateHistoryBadge();
+        }
+
+        function loadInvoice(id) {
+            const found = savedInvoices.find(inv => inv.id === id);
+            if (!found) return;
+
+            currentInvoice = JSON.parse(JSON.stringify(found));
+
+            document.getElementById('inputInvoiceNo').value = currentInvoice.invoiceNo;
+            document.getElementById('inputDate').value = currentInvoice.date;
+            document.getElementById('inputCustomerName').value = currentInvoice.customerName;
+            document.getElementById('inputCustomerPhone').value = currentInvoice.customerPhone || '';
+            document.getElementById('inputLocation').value = currentInvoice.location || 'Riyadh, KSA';
+            document.getElementById('inputDiscount').value = currentInvoice.discount || 0;
+            document.getElementById('inputTax').value = currentInvoice.taxRate || 0;
+
+            renderItemsForm();
+            updateInvoice();
+            switchTab('preview');
+        }
+
+        function deleteInvoice(id) {
+            if (confirm('Delete this saved receipt from history?')) {
+                db.ref('invoices/' + id).remove().then(() => {
+                    renderHistory();
+                });
+            }
+        }
+
+        function clearAllHistory() {
+            if (confirm('Are you sure you want to delete ALL booking history?')) {
+                db.ref('invoices').remove().then(() => {
+                    localStorage.removeItem('raja_khayam_permanent_invoices');
+                    renderHistory();
+                });
+            }
+        }
+
+        function updateHistoryBadge() {
+            document.getElementById('historyBadge').textContent = savedInvoices.length;
+        }
+
+        function capturePNG() {
+            const receipt = document.getElementById('invoiceReceipt916');
+            html2canvas(receipt, {
+                scale: 3,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const imageURI = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = `Invoice_${currentInvoice.invoiceNo}_${currentInvoice.customerName || 'Receipt'}.png`;
+                link.href = imageURI;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('invoiceReceipt916');
+            const opt = {
+                margin:       [4, 4, 4, 4],
+                filename:     `Invoice_${currentInvoice.invoiceNo}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        window.onload = function() {
+            document.getElementById('inputInvoiceNo').value = currentInvoice.invoiceNo;
+            document.getElementById('inputDate').value = currentInvoice.date;
+            renderItemsForm();
+            updateInvoice();
+            updateHistoryBadge();
+        };</script></body></html>
